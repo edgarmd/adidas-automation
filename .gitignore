@@ -1,0 +1,5 @@
+node_modules/
+.wdio-cache/
+logs/
+*.log
+.DS_Store
