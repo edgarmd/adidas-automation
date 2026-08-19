@@ -1,15 +1,13 @@
 const os = require('node:os');
 const path = require('node:path');
 
-// BROWSER=edge usa el Edge instalado (navegador real de consumo) con un perfil
-// persistente propio, en lugar del Chrome for Testing con perfil temporal.
-// El add-to-cart de adidas lo bloquea Akamai Bot Manager (403 en
-// POST /api/bridge/baskets/-/items) en sesiones que clasifica como bot, y un
-// perfil que persiste cookies entre corridas es lo único que puede cambiar ese
-// veredicto sin falsear la huella del navegador.
+// adidas bloquea el add-to-cart desde el WAF (403 en POST
+// /api/bridge/baskets/-/items) en sesiones que clasifica como bot. BROWSER=edge
+// usa el Edge de consumo con perfil persistente: cookies que sobreviven entre
+// corridas son la única palanca que cambia ese veredicto sin falsear la huella.
 const NAVEGADOR = process.env.BROWSER || 'chrome';
 
-// Perfil persistente y dedicado: no se toca el perfil personal del usuario.
+// Perfil dedicado: nunca el personal del usuario.
 const PERFIL = path.join(os.homedir(), '.cache', 'wdio', `perfil-e2e-${NAVEGADOR}`);
 
 const ARGS_COMUNES = [
@@ -18,9 +16,9 @@ const ARGS_COMUNES = [
     `--user-data-dir=${PERFIL}`
 ];
 
-// El flujo corre siempre con WebDriver Classic: al aceptar cookies adidas
-// inyecta iframes de terceros y BiDi (browsingContext.locateNodes) se queda
-// colgado, con lo que todo lookup posterior agota el timeout.
+// WebDriver Classic obligatorio: al aceptar cookies adidas inyecta iframes de
+// terceros y BiDi (browsingContext.locateNodes) se cuelga, con lo que todo
+// lookup posterior agota el timeout.
 const CAPABILITIES = {
     chrome: {
         browserName: 'chrome',
@@ -49,10 +47,8 @@ exports.config = {
     specs: ['./test/specs/**/*.js'],
     maxInstances: 1,
 
-    // Por defecto WDIO descarga Chrome/chromedriver en os.tmpdir(). macOS purga
-    // /var/folders y deja el .app a medias: los procesos hijos de Chrome mueren
-    // con exit_code=5 ("tab crashed") porque la firma del bundle ya no cuadra.
-    // Con una caché estable el navegador sobrevive entre sesiones.
+    // Fuera de os.tmpdir(): macOS purga /var/folders y deja el .app a medias,
+    // con lo que los hijos de Chrome mueren con exit_code=5 ("tab crashed").
     cacheDir: path.join(os.homedir(), '.cache', 'wdio'),
 
     capabilities: [CAPABILITIES[NAVEGADOR]],

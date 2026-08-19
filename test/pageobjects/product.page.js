@@ -1,16 +1,12 @@
 const Page = require('./page');
 
-/**
- * Detalle de producto (PDP): valida nombre y precio, elige talla
- * y añade al carrito validando el modal de confirmación.
- */
 class ProductPage extends Page {
 
     get nombre () {
         return $('h1');
     }
 
-    /** Según la plantilla de la PDP hay varios nodos de precio y sólo uno trae importe. */
+    /** La plantilla monta varios nodos de precio y sólo uno acaba con importe. */
     get precios () {
         return $$('[data-testid="main-price"]');
     }
@@ -20,19 +16,15 @@ class ProductPage extends Page {
     }
 
     /**
-     * Las tallas agotadas NO llevan el atributo `disabled`: se marcan con una
-     * clase `...size--unavailable...` y con el aria-label "La talla X no está
-     * disponible en este momento". Las disponibles son las que empiezan por
-     * "Talla:", así que ese es el filtro fiable.
+     * Las tallas agotadas NO llevan `disabled`: se marcan con clase
+     * `...size--unavailable...` y aria-label "La talla X no está disponible...".
+     * El filtro fiable son las que empiezan por "Talla:".
      */
     get tallasDisponibles () {
         return this.selectorTallas.$$('button[aria-label^="Talla:"]:not([disabled])');
     }
 
-    /**
-     * Hay otro botón "IR A AGREGAR AL CARRITO" que sólo hace scroll:
-     * el add-to-bag real es este.
-     */
+    /** Hay otro botón "IR A AGREGAR AL CARRITO" que sólo hace scroll. */
     get btnAnadirAlCarrito () {
         return $('button[data-auto-id="add-to-bag"]');
     }
@@ -41,7 +33,6 @@ class ProductPage extends Page {
         return $('[data-auto-id="added-to-bag-modal-title"]');
     }
 
-    /** Aviso que sale sobre el botón cuando la llamada al carrito falla. */
     get avisoErrorCarrito () {
         return $('[data-auto-id="cart-error-message"]');
     }
@@ -66,10 +57,7 @@ class ProductPage extends Page {
         return (await this.nombre.getText()).trim();
     }
 
-    /**
-     * Los nodos de precio se montan vacíos y sólo uno acaba con importe:
-     * devuelve el primero que lo tenga.
-     */
+    /** Los nodos de precio se montan vacíos: devuelve el primero con importe. */
     async obtenerPrecio () {
         let importe = '';
 
@@ -91,9 +79,8 @@ class ProductPage extends Page {
     }
 
     /**
-     * Usa la talla preferida si está disponible; si no (p. ej. un modelo
-     * infantil sin MX 9), cae a la primera talla en stock.
-     * Devuelve la talla que realmente se seleccionó.
+     * Cae a la primera talla en stock si la preferida no está (p. ej. un modelo
+     * infantil sin MX 9). Devuelve la talla realmente seleccionada.
      */
     async seleccionarTalla (preferida = 'MX 9') {
         await this.selectorTallas.waitForDisplayed({
@@ -122,10 +109,7 @@ class ProductPage extends Page {
         return elegida.texto;
     }
 
-    /**
-     * La talla elegida queda como role="radio" con aria-checked="true": sirve
-     * para comprobar que el clic surtió efecto y no sólo que se hizo.
-     */
+    /** El aria-checked confirma que el clic surtió efecto, no sólo que se hizo. */
     async tallaSeleccionada () {
         const boton = this.selectorTallas.$('button[aria-checked="true"]');
 
@@ -138,13 +122,9 @@ class ProductPage extends Page {
     }
 
     /**
-     * Tras el clic la PDP resuelve de una de tres formas: abre el modal de
-     * confirmación, pinta el aviso de error encima del botón, o lanza ese mismo
-     * aviso como alert() nativo. Las dos últimas son el 403 de Akamai en
-     * POST /api/bridge/baskets/-/items, y son intermitentes: la propia web pide
-     * recargar y reintentar, que es exactamente lo que se hace aquí.
-     *
-     * `talla` es necesaria porque la recarga borra la selección de talla.
+     * El 403 de Akamai en POST /api/bridge/baskets/-/items es intermitente y la
+     * propia web pide recargar y reintentar, que es lo que se hace aquí.
+     * `talla` es necesaria porque la recarga borra la selección.
      */
     async anadirAlCarrito ({ talla = null, intentos = 4 } = {}) {
         let ultimoError = null;
@@ -181,8 +161,8 @@ class ProductPage extends Page {
     }
 
     /**
-     * Espera a que aparezca el modal de confirmación o el aviso de error, en
-     * cualquiera de sus dos formas (nodo del DOM o alert nativo).
+     * El clic resuelve de tres formas: modal de confirmación, aviso de error
+     * sobre el botón, o ese mismo aviso como alert() nativo.
      */
     async esperarRespuestaDelCarrito () {
         let resultado = null;

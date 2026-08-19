@@ -1,8 +1,5 @@
 const Page = require('./page');
 
-/**
- * Checkout: valida el título de la pantalla "Pagar".
- */
 class CheckoutPage extends Page {
 
     get titulo () {

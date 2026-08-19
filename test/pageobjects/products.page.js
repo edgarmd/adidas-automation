@@ -1,12 +1,8 @@
 const Page = require('./page');
 
-/**
- * Listado (PLP) de Tenis Hombre: recorre la primera fila de calzado
- * y selecciona la posición 4.
- */
 class ProductsPage extends Page {
 
-    /** Cantidad de productos que componen la primera fila en desktop. */
+    /** Productos que componen la primera fila en desktop. */
     static get PRODUCTOS_POR_FILA () {
         return 4;
     }
@@ -16,8 +12,8 @@ class ProductsPage extends Page {
     }
 
     /**
-     * La imagen de hover existe sólo en algunas tarjetas y mide 0x0 hasta que
-     * el puntero entra: sirve para leer el nombre, nunca para hacer clic.
+     * Existe sólo en algunas tarjetas y mide 0x0 hasta que el puntero entra:
+     * sirve para leer el nombre, nunca para hacer clic.
      */
     imagenHover (tarjeta) {
         return tarjeta.$('[data-testid="product-card-hover-image"]');
@@ -42,18 +38,13 @@ class ProductsPage extends Page {
         });
     }
 
-    /**
-     * Devuelve las tarjetas de la primera fila (las primeras 4).
-     */
     async primeraFila () {
         await this.esperarListado();
         const tarjetas = await this.tarjetas;
         return tarjetas.slice(0, ProductsPage.PRODUCTOS_POR_FILA);
     }
 
-    /**
-     * Recorre toda la primera fila y devuelve nombre y precio de cada tenis.
-     */
+    /** Devuelve nombre y precio de cada tenis de la primera fila. */
     async recorrerPrimeraFila () {
         const fila = await this.primeraFila();
         const productos = [];
@@ -74,10 +65,7 @@ class ProductsPage extends Page {
         return productos;
     }
 
-    /**
-     * Hace clic en la posición indicada de la primera fila (1-based).
-     * Devuelve el nombre del producto seleccionado.
-     */
+    /** `posicion` es 1-based. Devuelve el nombre del producto seleccionado. */
     async seleccionarProducto (posicion = ProductsPage.PRODUCTOS_POR_FILA) {
         const fila = await this.primeraFila();
         const tarjeta = fila[posicion - 1];

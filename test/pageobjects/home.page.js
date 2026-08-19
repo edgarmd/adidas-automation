@@ -1,8 +1,5 @@
 const Page = require('./page');
 
-/**
- * Home de adidas.mx: menú principal (Hombre) y navegación a Calzado > Tenis.
- */
 class HomePage extends Page {
 
     get menuHombre () {
@@ -26,10 +23,7 @@ class HomePage extends Page {
         await this.aceptarCookies();
     }
 
-    /**
-     * El modal de seguimiento de cookies aparece al entrar por primera vez y
-     * bloquea el header con su overlay. Si no aparece, continúa sin fallar.
-     */
+    /** Sólo aparece en la primera visita, y su overlay bloquea el header. */
     async aceptarCookies () {
         const modalVisible = await this.cookiesmodal.waitForDisplayed({
             timeout: 15000,
@@ -53,8 +47,7 @@ class HomePage extends Page {
     async abrirMenuHombre () {
         // El header vive arriba: sin esto el hover puede quedar fuera de pantalla.
         await browser.execute(() => window.scrollTo(0, 0));
-        // El hover y el clic del flyout no pasan por clickOn: hay que limpiar
-        // aquí el diálogo del Account Portal si se abrió.
+        // El hover y el clic del flyout no pasan por clickOn: hay que limpiar aquí.
         await this.cerrarModalesBloqueantes();
         await this.menuHombre.waitForDisplayed();
         // El flyout se despliega con hover, no con clic.
@@ -67,9 +60,9 @@ class HomePage extends Page {
 
     /**
      * El flyout se cierra en cuanto el puntero sale del header, así que el
-     * puntero pasa directo del botón al link (sin scroll intermedio). Si el
-     * puntero se escapa, el link sigue en el DOM pero deja de ser interactuable,
-     * así que se reabre el menú y se reintenta.
+     * puntero pasa directo del botón al link (sin scroll intermedio). Si se
+     * escapa, el link sigue en el DOM pero deja de ser interactuable: se reabre
+     * el menú y se reintenta.
      */
     async irATenis ({ intentos = 3 } = {}) {
         let ultimoError;
@@ -95,8 +88,8 @@ class HomePage extends Page {
                 return;
             } catch (error) {
                 ultimoError = error;
-                // Sacar el puntero del header para que el flyout se cierre del todo
-                // antes de volver a abrirlo.
+                // Sacar el puntero del header para que el flyout se cierre del
+                // todo antes de volver a abrirlo.
                 await browser.execute(() => window.scrollTo(0, 400));
             }
         }

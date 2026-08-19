@@ -1,9 +1,5 @@
 const Page = require('./page');
 
-/**
- * Carrito: cambia la cantidad con una opción aleatoria del dropdown,
- * valida el resumen del pedido y avanza a pagar.
- */
 class CartPage extends Page {
 
     get dropdownCantidad () {
@@ -33,10 +29,7 @@ class CartPage extends Page {
         });
     }
 
-    /**
-     * Abre el dropdown y elige una cantidad al azar (distinta de la actual).
-     * Devuelve la cantidad seleccionada como número.
-     */
+    /** Elige al azar entre las opciones distintas de la cantidad actual. */
     async seleccionarCantidadAleatoria () {
         await this.esperarCarga();
         await this.clickOn(this.dropdownCantidad);
@@ -62,10 +55,7 @@ class CartPage extends Page {
         return Number(elegida.valor);
     }
 
-    /**
-     * Devuelve la cantidad de productos del resumen del pedido como número.
-     * (Ej.: "3 productos" -> 3)
-     */
+    /** "3 productos" -> 3 */
     async obtenerTotalProductos () {
         await this.totalProductos.waitForDisplayed({
             timeout: 15000,
@@ -75,9 +65,6 @@ class CartPage extends Page {
         return Number(texto.match(/\d+/)?.[0]);
     }
 
-    /**
-     * Espera a que el resumen refleje la cantidad esperada.
-     */
     async esperarTotalProductos (esperado) {
         await browser.waitUntil(
             async () => (await this.obtenerTotalProductos()) === esperado,

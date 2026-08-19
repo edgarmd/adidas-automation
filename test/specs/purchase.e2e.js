@@ -7,10 +7,9 @@ const ProductPage = require('../pageobjects/product.page');
 const TALLA = 'MX 9';
 const POSICION = 4;
 
-// El flujo llega hasta la selección de talla. El "añadir al carrito" queda fuera
-// porque adidas lo bloquea desde el WAF: POST /api/bridge/baskets/-/items
-// responde 403 (Akamai Bot Manager) en sesiones automatizadas. El page object
-// ProductPage sigue teniendo esos métodos listos para cuando se pueda usar.
+// El flujo termina en la selección de talla: el "añadir al carrito" lo bloquea
+// el WAF de adidas (403 de Akamai en sesiones automatizadas). ProductPage
+// conserva esos métodos listos para cuando se pueda usar.
 describe('adidas.mx - Flujo de compra Hombre > Calzado > Tenis', () => {
 
     let nombreEnListado;

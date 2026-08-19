@@ -4,15 +4,10 @@ module.exports = class Page {
     }
 
     /**
-     * El PDP de adidas abre por su cuenta el "Account Portal" (adiClub: "Inicia
-     * sesión o regístrate") en un <dialog> modal, con touchpoint BEHAVIOURAL y a
-     * los ~2 s de cargar. No lo dispara ningún paso del test: la pila de llamadas
-     * sale de pdp-app > React > HTMLDialogElement.showModal. Si el iframe no
-     * carga, el diálogo se queda con "Failed to load Account Portal".
-     *
-     * En cualquiera de los dos casos es un <dialog> modal: vive en el top layer y
-     * bloquea los clics de toda la página (todo queda "not clickable"). Como
-     * aparece de forma intermitente, se cierra antes de cada clic.
+     * El PDP abre por su cuenta el "Account Portal" de adiClub en un <dialog>
+     * modal (~2 s tras cargar, no lo dispara ningún paso del test). Vive en el
+     * top layer y deja toda la página "not clickable"; como aparece de forma
+     * intermitente, se cierra antes de cada clic.
      */
     async cerrarModalesBloqueantes () {
         return browser.execute(() => {
@@ -38,10 +33,8 @@ module.exports = class Page {
     }
 
     /**
-     * El aviso de error del carrito llega unas veces como nodo del DOM y otras
-     * como alert() nativo. Un alert abierto bloquea TODO comando WebDriver
-     * posterior (el propio driver responde con el texto del alert), así que hay
-     * que cerrarlo antes de seguir. Devuelve su texto, o null si no había.
+     * Un alert() nativo abierto bloquea todo comando WebDriver posterior, así
+     * que hay que cerrarlo antes de seguir. Devuelve su texto, o null si no había.
      */
     async cerrarAlertaNativa () {
         try {
@@ -53,11 +46,7 @@ module.exports = class Page {
         }
     }
 
-    /**
-     * Baja hasta el elemento y espera a que sea clickeable antes de hacer clic.
-     * Reintenta porque el diálogo del Account Portal puede colarse justo entre
-     * la comprobación y el clic.
-     */
+    /** Reintenta porque el modal de adiClub puede colarse entre el waitForClickable y el clic. */
     async clickOn (element, { intentos = 3 } = {}) {
         await element.waitForDisplayed();
 
@@ -80,9 +69,6 @@ module.exports = class Page {
         throw ultimoError;
     }
 
-    /**
-     * Devuelve un entero aleatorio entre min y max (ambos incluidos).
-     */
     randomInt (min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
